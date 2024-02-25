@@ -1,30 +1,18 @@
 using PortAudio
-using DataStructures
+using SampledSignals
 
-struct RecBuffer
-    n::Int64
-    pos::Int64
-    buffer::Vector{T} where T <: AbstractFloat
-end
-
-function RecBuffer(n)
-    r = RecBuffer(n, 0, zeros(Float32, n))
-    r
-end
     
-function record!(s::Vector{T}, r::RecBuffer) where  T <: AbstractFloat
-    ns = length(s)
-    r[r.pos:(r.pos+ns)] .= s
-end
 
-function audioLoop()#buffer::CircularBuffer)
+function audioLoop(n; framesize=1024)#buffer::CircularBuffer)
     stream = PortAudioStream(1, 0)
-    r = RecBuffer(48000)
-    while r.pos < r.n 
+    r = SampleBuf(zeros(Float32,n), samplerate(stream))
+    ntot = 0
+    while ntot < n
         try
             # cancel with Ctrl-C
-            s = read(stream, 1024)
-            record!(Vector(s[:,1]), r) 
+            # s = read(stream, framesize)
+            read!(stream, r, framesize)
+            ntot += framesize
         catch e
             #println(e)
             throw(e)
@@ -34,12 +22,12 @@ function audioLoop()#buffer::CircularBuffer)
     r
 end
 
-function play(r::RecBuffer)
-    s = r.buffer
-    stream = PortAudio(0,1)
+function play(s::T) where T <: SampleBuf
+    stream = PortAudioStream(0,1)
     write(stream, s)
 end
 
-r = audioLoop()
+r = audioLoop(48000)
+display(r)
 play(r)
 sleep(1)
