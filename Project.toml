@@ -1,0 +1,5 @@
+[deps]
+CImGui = "5d785b6c-b76f-510e-a07c-3070796c7e87"
+DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
+PortAudio = "80ea8bcb-4634-5cb3-8ee8-a132660d1d2d"
+SampledSignals = "bd7594eb-a658-542f-9e75-4c4d8908c167"
